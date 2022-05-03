@@ -1,4 +1,6 @@
-FROM openjdk:8-jdk-alpine
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} app.jar
-ENTRYPOINT ["java","-jar","/app.jar"]
+FROM maven:latest
+RUN mkdir /mnist
+WORKDIR /minst
+COPY . .
+RUN mvn clean install
+CMD mvn spring-boot:run
