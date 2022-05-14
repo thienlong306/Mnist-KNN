@@ -58,36 +58,86 @@ $("#submit").click(function (e) {
     var myCanvas = $(document).find('#canvas');
     var image = myCanvas.get(0).toDataURL();
     // console.log($("#inputK").val());
-    $.ajax({
-        type: "post",
-        url: "postImg",
-        data: {"imageBase64":image,"inputK":$("#inputK").val()},
-        dataType: "json",
-        timeout: 10000,
-        async: false,
-        error: function(){
-            console.log("WOOPS");
-        },
-        success: function (response) {
-            console.log(response.msg);
-            let w = response.msg.split(", ");
-            console.log(w);
-            let result=w[0].split("=");
-            if(result[1]/$("#inputK").val()>0.5){
-                $("#result").css("font-size", 150);
-                $("#result").html(result[0]);
-            }else
-            {            
-                $("#result").css("font-size", 80);
-                $("#result").html("Not Found");
+    $("#result").css("font-size", 70);
+    $("#result").html("Finding");
+    $(".details").html("Finding");
+    $(".imgCoveted").html("");
+    $("#myChart").remove();
+    setTimeout(() => {
+        $.ajax({
+            type: "post",
+            url: "postImg",
+            data: {"imageBase64":image,"inputK":$("#inputK").val()},
+            dataType: "json",
+            timeout: 10000,
+            async: false,
+            error: function(){
+                console.log("WOOPS");
+            },
+            success: function (response) {
+                // $(".details").html(response.msg);
+                imgConverted(response.test);
+                let w = response.msg.split(",");
+                barChart(w);
+                console.log(w);
+                let result=w[0].split("=");
+                if(result[1]/$("#inputK").val()>0.5){
+                    $("#result").css("font-size", 150);
+                    $("#result").html(result[0]);
+                }else
+                {            
+                    $("#result").css("font-size", 80);
+                    $("#result").html("Not Found");
+                }
             }
-        }
-    });
+        }); 
+    }, 100);
 });
+function imgConverted(data) {
+    var tmp=data.replace('[','');
+    tmp=tmp.replace(']','');
+    var tmp1=data.split(',');
+    console.log(tmp1);
+    for (let i=0;i<28*28;i++){
+        if (tmp1[i]==" 255"){
+            $(".imgCoveted").append(`<span style="color:red;">${tmp1[i]}</span> `);
+        }else
+            $(".imgCoveted").append(`<span style="color:white;">${tmp1[i]}</span>   `);
+        if (i%28==0&&i!=0)
+            $(".imgCoveted").append("<br>");
+    }
+}
 
-
-
-
+var xValues = ["0", "1", "2", "3", "4","5","6","7","8","9"];
+var yValues;
+var barColors = ["red", "green","blue","orange","brown"];
+function barChart(data) {
+    $(".col-12").append(`<canvas id="myChart" style="width:100%;max-width:600px;"></canvas>`);
+    yValues = [0,0,0,0,0,0,0,0,0,0];
+    console.log(data);
+    for (let index = 0; index < data.length; index++) {
+        let result=data[index].replace(" ","").split("=");
+        yValues[result[0]]=result[1];
+    }
+    console.log(yValues);
+    new Chart("myChart", {
+        type: "bar",
+        data: {
+          labels: xValues,
+          datasets: [{
+            backgroundColor: barColors,
+            data: yValues
+          }]
+        },
+        options: {
+          legend: {display: false},
+          title: {
+            display: true,
+            text: "Bar chart"
+          }
+        }
+      });
+}
 // function updateSizeOnScreen() {
 //     sizeEL.innerText = size
 // }

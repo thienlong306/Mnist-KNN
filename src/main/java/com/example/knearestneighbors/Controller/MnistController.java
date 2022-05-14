@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Arrays;
 
 @Controller
 @RequestMapping("")
@@ -32,6 +33,7 @@ public class MnistController{
         String base64Image=imageBase64.split(",")[1];
         byte[] bytes= DatatypeConverter.parseBase64Binary(base64Image);
         res.put("msg",mnistService.getResult(bytes,inputK).toString().replace("{","").replace("}",""));
+        res.put("test",Arrays.toString(mnistService.getTest().getData()));
         return res;
     }
 

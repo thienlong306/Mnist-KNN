@@ -25,7 +25,10 @@ public class MnistServiceImpl implements MnistService {
         getImg(fileImg);
         return classify(listTrain,test,inputK);
     }
-
+    @Override
+    public MinstModel getTest(){
+        return test;
+    }
     @Override
     public void loadTrain() {
         BufferedReader br = null;
